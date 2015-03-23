@@ -1,0 +1,25 @@
+#:kivy 1.0
+#:import GridLayout kivy.uix.gridlayout.GridLayout
+#:import TreeView kivy.uix.treeview
+#:import TreeViewLabel kivy.uix.treeview
+#:import ListView kivy.uix.listview
+
+GridLayout:
+    cols: 3
+    TreeView:
+        size_hint: (0.2, 1)
+        TreeViewLabel:
+            text: "test1"
+        TreeViewLabel:
+            text: "test2"
+        TreeViewLabel:
+            text: "test3"
+
+    Button:
+        size_hint: (0.6, 1)
+        text: "main area"
+
+    ListView:
+        size_hint: (0.2, 1)
+        id: "settingsList"
+
