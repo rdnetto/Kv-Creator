@@ -52,3 +52,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Output from pyuic4
+*_ui.py
