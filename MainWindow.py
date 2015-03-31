@@ -1,13 +1,28 @@
 
 import kivy.app
 import kivy.lang
+import traceback
 
 from threading import Thread
-from PySide.QtGui import QMainWindow
+from PySide.QtGui import QMainWindow, QMessageBox, QApplication
 from Queue import Queue
 
 from creator_ui import Ui_MainWindow
 from kvparser import parseKv
+
+
+def ErrorHandler(func):
+    '''Function decorator for displaying exceptions'''
+
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception:
+            traceback.print_exc()
+            QMessageBox.critical(None, "Error", traceback.format_exc())
+            QApplication.exit(1)
+
+    return wrapper
 
 
 class MainWindow(Ui_MainWindow, QMainWindow):
@@ -19,6 +34,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.actionOpen.triggered.connect(self.openFile)
 
 
+    @ErrorHandler
     def openFile(self):
         if(self.demoThread is not None and self.demoThread.is_alive()):
             raise Exception("File already open")
