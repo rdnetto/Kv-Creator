@@ -8,7 +8,7 @@ from PySide.QtGui import QMainWindow, QMessageBox, QApplication
 from Queue import Queue
 
 from creator_ui import Ui_MainWindow
-from kvparser import parseKv
+from kvparser import KvFile
 
 
 def ErrorHandler(func):
@@ -51,7 +51,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             raise Exception("Failed to load file")
 
         # TODO: parse Kv file, correspond to widget tree
-        (self.rootRule, self.classRules) = parseKv(path)
+        self.kvfile = KvFile(path)
 
         # TODO; populate widget tree
 
