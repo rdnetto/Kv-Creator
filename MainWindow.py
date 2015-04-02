@@ -32,6 +32,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
         self.demoThread = None
         self.actionOpen.triggered.connect(self.openFile)
+        self.actionSave.triggered.connect(self.saveFile)
 
 
     @ErrorHandler
@@ -56,6 +57,14 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
         print("Parsed and corresponded kv file:")
         print("\n".join(map(str, self.kvfile.elements)))
+
+
+    @ErrorHandler
+    def saveFile(self):
+        if(self.kvfile is None):
+            raise Exception("No file open")
+
+        self.kvfile.save()
 
 
 def demo(path, rootQueue):

@@ -1,9 +1,14 @@
 import re
+import itertools
 
 
 class KvElement:
     '''Root class for all elements in a .kv file'''
-    pass
+
+    def export(self):
+        '''Converts the element to Kivy file format.
+        Returns a list of strings (lines).'''
+        assert False, "Not implemented"
 
 
 class KvComment(KvElement):
@@ -14,6 +19,9 @@ class KvComment(KvElement):
 
     def __repr__(self):
         return "KvComment: " + repr(self.text)
+
+    def export(self):
+        return ["#" + self.text]
 
 
 class KvWidget(KvElement):
@@ -51,6 +59,14 @@ class KvWidget(KvElement):
 
         return res
 
+    def export(self):
+        res = [self.name + ":"]
+
+        for e in self.elements:
+            res.extend(map(indent, e.export()))
+
+        return res
+
 
 class KvProperty(KvElement):
     def __init__(self, name, value):
@@ -60,13 +76,35 @@ class KvProperty(KvElement):
     def __repr__(self):
         return "KvProperty: {{name = {}, value = {}}}".format(self.name, self.value)
 
+    def export(self):
+        return ["{}: {}".format(self.name, self.value)]
+
 
 class KvClassRule(KvElement):
     def __init__(self, name):
         self.name = name
+        self.elements = []
 
     def __repr__(self):
-        return "KvClassRule: " + self.name
+        return "KvClassRule: {} {{{} elements}}".format(self.name, len(self.elements))
+
+    def __str__(self):
+        '''Creates a textual representation of the KvElement tree.'''
+
+        res = repr(self) + "\n"
+
+        for e in self.elements:
+            res += indent(str(e)) + "\n"
+
+        return res
+
+    def export(self):
+        res = ["<{}>:".format(self.name)]
+
+        for e in self.elements:
+            res.extend(map(indent, e.export()))
+
+        return res
 
 
 class KvFile:
@@ -160,6 +198,16 @@ class KvFile:
         assert len(widgets) <= 1
         self.elements = root.elements
         self.rootRule = widgets[0] if len(widgets) > 0 else None
+
+
+    def save(self, path=None):
+        '''Save the file'''
+
+        path = self.path if path is None else path
+
+        with open(path, "w") as f:
+            for line in itertools.chain(*map(lambda e: e.export(), self.elements)):
+                f.write(line + "\n")
 
 
 def indent_count(s, line):
