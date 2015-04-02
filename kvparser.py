@@ -103,19 +103,13 @@ class KvFile(KvElement):
                         assert current_root.parent is not None
                         current_root = current_root.parent
 
-                    new_element = parse_line(current_root, indent_level, line_type, line_data)
-                    current_root.elements.append(new_element)
-
-                # the case for same scope and higher scope and handled the same, now that we've updated current_root
-                if(indent_level > last_indent):
+                elif(indent_level > last_indent):
                     # deeper scope - add to last element
                     current_root = new_element
-                    new_element = parse_line(current_root, indent_level, line_type, line_data)
 
-                else:
-                    # same scope - add to parent
-                    new_element = parse_line(current_root, indent_level, line_type, line_data)
-                    current_root.elements.append(new_element)
+                # add new element
+                new_element = parse_line(current_root, indent_level, line_type, line_data)
+                current_root.elements.append(new_element)
 
                 last_indent = indent_level
 
