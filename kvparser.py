@@ -30,7 +30,7 @@ class KvClassRule(KvElement):
         self.name = name
 
 
-class KvFile(KvElement):
+class KvFile:
     '''Represents the structure of a KvFile'''
 
     # each line must match one of the following formats:
@@ -52,8 +52,6 @@ class KvFile(KvElement):
         self.path = path
         self.rootRule = None
         self.elements = []
-        self.indent_level = -1
-        self.parent = None
         self.parse()
 
 
@@ -65,11 +63,17 @@ class KvFile(KvElement):
         classRules: a list of class rules defined at root scope
         '''
 
+        # define a fake root element to collect the parse output
+        root = KvElement()
+        root.elements = []
+        root.indent_level = -1
+        root.parent = None
+        root.__repr__ = lambda: "<root>"
+
         # the scope of each line is defined by its indentation
         # comments should bypass scope rules
-
         last_indent = 0
-        current_root = self
+        current_root = root
         new_element = None
 
         with open(self.path, "r") as f:
@@ -113,6 +117,11 @@ class KvFile(KvElement):
 
                 last_indent = indent_level
 
+        widgets = list(filter(is_widget, root.elements))
+        assert len(widgets) <= 1
+        self.elements = root.elements
+        self.rootRule = widgets[0] if len(widgets) > 0 else None
+
 
 def indent_count(s, line):
     '''Returns an integer representing the no. of spaces by which the line has been indented.'''
@@ -151,4 +160,10 @@ def parse_line(parent, indent_level, line_type, data):
     res.indent_level = indent_level
     res.parent = parent
     return res
+
+
+def is_widget(e):
+    '''Helper method which returns True if e is a KvWidget'''
+
+    return isinstance(e, KvWidget)
 
