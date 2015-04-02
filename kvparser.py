@@ -12,11 +12,44 @@ class KvComment(KvElement):
     def __init__(self, text):
         self.text = text
 
+    def __repr__(self):
+        return "KvComment: " + repr(self.text)
+
 
 class KvWidget(KvElement):
     def __init__(self, name):
         self.name = name
         self.elements = []
+        self.widget = None
+
+    def populate(self, widget):
+        '''Merges a widget tree into the KvElement tree.'''
+
+        # Merge root
+        assert self.name == type(widget).__name__.split(".")[-1]
+        self.widget = widget
+
+        # There should be at least as many children in the widget as there are in the kv file
+        # Note that there can be more, if the widget automatically adds children
+        widgets = filter(is_widget, self.elements)
+        assert len(widgets) <= len(widget.children), "self.elements = {}\nwidget.children = {}".format(self.elements, widget.children)
+
+        # the elements and widget tree are in opposite orders
+        for e, c in zip(widgets, reversed(widget.children)):
+            e.populate(c)
+
+    def __repr__(self):
+        return "KvWidget: {} {{{} elements, widget = {}}}".format(self.name, len(self.elements), self.widget)
+
+    def __str__(self):
+        '''Creates a textual representation of the KvElement tree.'''
+
+        res = repr(self) + "\n"
+
+        for e in self.elements:
+            res += indent(str(e)) + "\n"
+
+        return res
 
 
 class KvProperty(KvElement):
@@ -24,10 +57,16 @@ class KvProperty(KvElement):
         self.name = name
         self.value = value
 
+    def __repr__(self):
+        return "KvProperty: {{name = {}, value = {}}}".format(self.name, self.value)
+
 
 class KvClassRule(KvElement):
     def __init__(self, name):
         self.name = name
+
+    def __repr__(self):
+        return "KvClassRule: " + self.name
 
 
 class KvFile:
@@ -166,4 +205,8 @@ def is_widget(e):
     '''Helper method which returns True if e is a KvWidget'''
 
     return isinstance(e, KvWidget)
+
+
+def indent(s, prefix="    "):
+    return prefix + ("\n" + prefix).join(s.splitlines())
 
