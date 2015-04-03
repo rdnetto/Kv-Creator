@@ -59,6 +59,30 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         print("Parsed and corresponded kv file:")
         print("\n".join(map(str, self.kvfile.elements)))
 
+        # add element tree to GUI
+        model = QStandardItemModel()
+        root = model.invisibleRootItem()
+
+        a = QStandardItem("A")
+        a.appendRow(QStandardItem("A1"))
+        a.appendRow(QStandardItem("A2"))
+        a.appendRow(QStandardItem("A2"))
+
+        b = QStandardItem("B")
+        b.appendRow(QStandardItem("B1"))
+        b.appendRow(QStandardItem("B2"))
+        b.appendRow(QStandardItem("B2"))
+
+        c = QStandardItem("C")
+        c.appendRow(QStandardItem("C1"))
+        c.appendRow(QStandardItem("C2"))
+        c.appendRow(QStandardItem("C2"))
+
+        root.appendRow(a)
+        root.appendRow(b)
+        root.appendRow(c)
+        self.widgetTree.setModel(model)
+
 
     @ErrorHandler
     def saveFile(self):
