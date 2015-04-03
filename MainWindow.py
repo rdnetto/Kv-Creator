@@ -4,7 +4,7 @@ import kivy.lang
 import traceback
 
 from threading import Thread
-from PySide.QtGui import QMainWindow, QMessageBox, QApplication
+from PySide.QtGui import *
 from Queue import Queue
 
 from creator_ui import Ui_MainWindow
@@ -40,7 +40,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         if(self.demoThread is not None and self.demoThread.is_alive()):
             raise Exception("File already open")
 
-        # load file in kivy thread
+        # graphically load file in kivy thread
         rootQueue = Queue()
         path = "test.kv"
         self.demoThread = Thread(name="kivy", target=demo, args=[path, rootQueue])
@@ -48,6 +48,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.demoThread.start()
         self.rootWidget = rootQueue.get()
 
+        # load source and correspond to graphical objects
         self.kvfile = KvFile(path)
 
         if(self.rootWidget is None):
